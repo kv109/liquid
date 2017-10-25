@@ -11,7 +11,6 @@ module Liquid
 
     def initialize(markup)
       lookups = markup.scan(VariableParser)
-
       name = lookups.shift
       if name =~ SQUARE_BRACKETED
         name = Expression.parse($1)
@@ -41,10 +40,11 @@ module Liquid
         # If object is a hash- or array-like object we look for the
         # presence of the key and if its available we return it
         if object.respond_to?(:[]) &&
-            ((object.respond_to?(:key?) && object.key?(key)) ||
+            ((object.respond_to?(:key?) ) ||
              (object.respond_to?(:fetch) && key.is_a?(Integer)))
 
           # if its a proc we will replace the entry with the proc
+          object[key] = nil unless object.key?(key)
           res = context.lookup_and_evaluate(object, key)
           object = res.to_liquid
 
